@@ -84,6 +84,12 @@
 }
 
 /* Masquer les effets hover pour les cartes dans le panneau de prévisualisation */
+.card.previewPanel {
+  scale: 1.2;
+  margin-bottom: 10px;
+}
+
+/* Masquer les effets hover pour les cartes dans le panneau de prévisualisation */
 .card.previewPanel .overlay {
   opacity: 0 !important;
   visibility: hidden !important;

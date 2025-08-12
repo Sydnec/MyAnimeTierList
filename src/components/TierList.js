@@ -4,26 +4,22 @@ import styles from "./TierList.module.css";
 
 const DEFAULT_TIERS = [
   { id: "S", name: "S - Légendaire", color: "#ff6b6b" },
-  { id: "A", name: "A - Excellent", color: "#4ecdc4" },
-  { id: "B", name: "B - Très bon", color: "#45b7d1" },
-  { id: "C", name: "C - Bon", color: "#96ceb4" },
-  { id: "D", name: "D - Moyen", color: "#feca57" },
-  { id: "F", name: "F - Mauvais", color: "#ff9ff3" },
+  { id: "A", name: "A - Excellent", color: "#ff9f43" },
+  { id: "B", name: "B - Très bon", color: "#feca57" },
+  { id: "C", name: "C - Bon", color: "#55efc4" },
+  { id: "D", name: "D - Moyen", color: "#00b894" },
 ];
 
 const TIER_COLORS = [
-  "#ff6b6b",
-  "#4ecdc4",
-  "#45b7d1",
-  "#96ceb4",
-  "#feca57",
-  "#ff9ff3",
-  "#a8e6cf",
-  "#ffd93d",
-  "#6c5ce7",
-  "#fd79a8",
-  "#e17055",
-  "#74b9ff",
+  "#ff6b6b", // rouge
+  "#ff9f43", // orange
+  "#feca57", // jaune
+  "#55efc4", // vert clair
+  "#00b894", // vert
+  "#00bfff", // bleu clair
+  "#0984e3", // bleu
+  "#6c5ce7", // violet
+  "#a29bfe", // violet clair
 ];
 
 export default function TierList({
@@ -46,7 +42,7 @@ export default function TierList({
   const [dragOverPosition, setDragOverPosition] = useState(null);
   const [editingTier, setEditingTier] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(true);
 
   // Synchronise avec les props collaboratives
   useEffect(() => {
@@ -532,6 +528,49 @@ export default function TierList({
     updateTiers(newTiers);
   };
 
+  // Gérer le déclassement d'un anime (équivalent à un drag vers "unranked")
+  const handleAnimeUnrank = (anime) => {
+    const currentTier = tierAssignments.get(anime.id);
+    
+    if (!currentTier) {
+      // L'anime est déjà non classé, on appelle la suppression complète
+      if (onAnimeDelete) {
+        onAnimeDelete(anime);
+      }
+      return;
+    }
+
+    // Simuler exactement le même comportement qu'un drag & drop vers "unranked"
+    const newAssignments = new Map(tierAssignments);
+    newAssignments.delete(anime.id);
+
+    const newTierOrders = new Map(tierOrders);
+    
+    // Nettoyer l'ordre de l'ancien tier
+    if (currentTier !== "unranked") {
+      const oldOrder = newTierOrders.get(currentTier) || [];
+      const cleanedOrder = oldOrder.filter((id) => id !== anime.id);
+      newTierOrders.set(currentTier, cleanedOrder);
+    }
+
+    updateTierAssignments(newAssignments);
+    updateTierOrders(newTierOrders);
+
+    // Notifier les changements d'ordre
+    if (onTierOrdersChange) {
+      onTierOrdersChange(newTierOrders);
+    }
+
+    // Calculer la position finale dans "unranked" (à la fin)
+    const unrankedAnimes = organizedAnimes.unranked || [];
+    const finalPosition = unrankedAnimes.length;
+
+    // Émettre l'événement collaboratif (comme dans handleDrop)
+    if (onTierChange) {
+      onTierChange(anime.id, "unranked", finalPosition);
+    }
+  };
+
   const organizedAnimes = organizeAnimesByTier();
   const firstUnrankedAnime = organizedAnimes.unranked?.[0];
 
@@ -662,7 +701,7 @@ export default function TierList({
                         tierColor={getTierColor(tier.id)}
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
-                        onDelete={onAnimeDelete}
+                        onDelete={handleAnimeUnrank}
                         isDragging={draggedItem?.id === anime.id}
                       />
                     )}
