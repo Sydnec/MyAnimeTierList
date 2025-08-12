@@ -106,7 +106,6 @@ class Database {
       { id: "B", name: "B - Très bon", color: "#45b7d1", position: 2 },
       { id: "C", name: "C - Bon", color: "#96ceb4", position: 3 },
       { id: "D", name: "D - Moyen", color: "#feca57", position: 4 },
-      { id: "F", name: "F - Mauvais", color: "#ff9ff3", position: 5 },
     ];
 
     defaultTiers.forEach((tier) => {
