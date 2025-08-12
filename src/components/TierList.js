@@ -109,8 +109,20 @@ export default function TierList({
       organized[tier].push(anime);
     });
 
-    // Applique l'ordre personnalisé pour chaque tier
+    // Trie les animés non-classés par ordre alphabétique
+    if (organized["unranked"] && organized["unranked"].length > 0) {
+      organized["unranked"].sort((a, b) => {
+        const titleA = (a.title || "").toLowerCase();
+        const titleB = (b.title || "").toLowerCase();
+        return titleA.localeCompare(titleB);
+      });
+    }
+
+    // Applique l'ordre personnalisé pour chaque tier (SAUF pour unranked qui est trié alphabétiquement)
     Object.keys(organized).forEach((tierId) => {
+      // Ignore les animés non-classés car ils sont déjà triés alphabétiquement
+      if (tierId === "unranked") return;
+      
       const tierOrder = tierOrders.get(tierId);
       if (tierOrder && tierOrder.length > 0) {
         // Trie selon l'ordre personnalisé, puis ajoute les nouveaux animes à la fin
@@ -333,7 +345,19 @@ export default function TierList({
       organized[tier].push(anime);
     });
 
+    // Trie les animés non-classés par ordre alphabétique
+    if (organized["unranked"] && organized["unranked"].length > 0) {
+      organized["unranked"].sort((a, b) => {
+        const titleA = (a.title || "").toLowerCase();
+        const titleB = (b.title || "").toLowerCase();
+        return titleA.localeCompare(titleB);
+      });
+    }
+
     Object.keys(organized).forEach((tierId) => {
+      // Ignore les animés non-classés car ils sont déjà triés alphabétiquement
+      if (tierId === "unranked") return;
+      
       const tierOrder = tierOrders.get(tierId);
       if (tierOrder && tierOrder.length > 0) {
         const orderedAnimes = [];
@@ -410,7 +434,19 @@ export default function TierList({
       organized[tier].push(anime);
     });
 
+    // Trie les animés non-classés par ordre alphabétique
+    if (organized["unranked"] && organized["unranked"].length > 0) {
+      organized["unranked"].sort((a, b) => {
+        const titleA = (a.title || "").toLowerCase();
+        const titleB = (b.title || "").toLowerCase();
+        return titleA.localeCompare(titleB);
+      });
+    }
+
     Object.keys(organized).forEach((tierId) => {
+      // Ignore les animés non-classés car ils sont déjà triés alphabétiquement
+      if (tierId === "unranked") return;
+      
       const tierOrder = tierOrders.get(tierId);
       if (tierOrder && tierOrder.length > 0) {
         const orderedAnimes = [];

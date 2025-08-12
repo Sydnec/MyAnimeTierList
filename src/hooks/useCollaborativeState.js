@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 // Fonctions de persistance localStorage
 const saveToLocalStorage = (state) => {
   try {
-    localStorage.setItem("myanimet-tierlist-state", JSON.stringify(state));
+    localStorage.setItem("myanime-tierlist-state", JSON.stringify(state));
   } catch (error) {
     console.error("Erreur sauvegarde localStorage:", error);
   }
@@ -14,7 +14,7 @@ const saveToLocalStorage = (state) => {
 
 const loadFromLocalStorage = () => {
   try {
-    const saved = localStorage.getItem("myanimet-tierlist-state");
+    const saved = localStorage.getItem("myanime-tierlist-state");
     if (saved) {
       return JSON.parse(saved);
     }

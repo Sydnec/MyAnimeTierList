@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'myanimet-tierlist',
+      name: 'myanime-tierlist',
       script: 'server.js',
       cwd: '/home/sydnec/myanimetierlist',
       instances: 1, // Vous pouvez augmenter selon vos besoins
