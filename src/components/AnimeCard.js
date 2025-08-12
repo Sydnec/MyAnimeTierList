@@ -7,6 +7,7 @@ export default function AnimeCard({
   onDelete,
   tier = null,
   isPreview = false,
+  isPreviewPanel = false,
 }) {
   const handleDragStart = (e) => {
     if (isPreview) {
@@ -32,7 +33,7 @@ export default function AnimeCard({
     <div
       className={`${styles.card} ${tier ? styles[`tier-${tier}`] : ""} ${
         isPreview ? styles.preview : ""
-      }`}
+      } ${isPreviewPanel ? styles.previewPanel : ""}`}
       draggable={!isPreview}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
@@ -45,7 +46,7 @@ export default function AnimeCard({
           className={styles.image}
           loading="lazy"
         />
-        {!isPreview && onDelete && (
+        {!isPreview && !isPreviewPanel && onDelete && (
           <button
             className={styles.deleteButton}
             onClick={handleDelete}

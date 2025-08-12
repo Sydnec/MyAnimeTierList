@@ -535,6 +535,12 @@ export default function TierList({
   const organizedAnimes = organizeAnimesByTier();
   const firstUnrankedAnime = organizedAnimes.unranked?.[0];
 
+  // Fonction helper pour obtenir la couleur d'un tier
+  const getTierColor = (tierId) => {
+    const tier = tiers.find(t => t.id === tierId);
+    return tier ? tier.color : null;
+  };
+
   return (
     <div className={styles.tierListContainer}>
       <div className={styles.tierList}>
@@ -645,6 +651,7 @@ export default function TierList({
                         <AnimeCard
                           anime={anime.draggedAnime}
                           tier={tier.id}
+                          tierColor={getTierColor(tier.id)}
                           isPreview={true}
                         />
                       </div>
@@ -652,6 +659,7 @@ export default function TierList({
                       <AnimeCard
                         anime={anime}
                         tier={tier.id}
+                        tierColor={getTierColor(tier.id)}
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
                         onDelete={onAnimeDelete}
@@ -675,6 +683,7 @@ export default function TierList({
                       <AnimeCard
                         anime={draggedItem}
                         tier={tier.id}
+                        tierColor={getTierColor(tier.id)}
                         isPreview={true}
                       />
                     </div>
@@ -779,14 +788,28 @@ export default function TierList({
               )}
             </div>
 
-            <div className={styles.previewAnime}>
-              <AnimeCard
-                anime={firstUnrankedAnime}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                onDelete={onAnimeDelete}
-              />
-            </div>
+            {previewOpen && (
+              <div className={styles.previewAnime}>
+                <AnimeCard
+                  anime={firstUnrankedAnime}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDelete={onAnimeDelete}
+                  isPreviewPanel={true}
+                />
+                {/* Ajout des infos de l'anime */}
+                <div className={styles.animeInfo}>
+                  <h4 className={styles.animeTitle}>
+                    {firstUnrankedAnime.title || firstUnrankedAnime.name}
+                  </h4>
+                  {firstUnrankedAnime.year && (
+                    <div className={styles.animeYear}>
+                      ({firstUnrankedAnime.year})
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

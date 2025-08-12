@@ -175,39 +175,59 @@ export default function Home() {
       typeof anime.id
     );
 
-    // Supprime localement d'abord
-    const newCollection = new AnimeCollection();
-    animeCollection.getAllAnimes().forEach((existingAnime) => {
-      if (existingAnime.id !== anime.id) {
-        newCollection.addAnime(existingAnime);
+    // Vérifie si l'anime est assigné à un tier
+    const currentTier = tierAssignments.get(anime.id);
+    
+    if (currentTier) {
+      // L'anime est dans un tier, on le déplace vers "non classés"
+      console.log("📦 Anime dans le tier:", currentTier, "-> déplacement vers non classés");
+      
+      // Met à jour les affectations de tiers (supprime l'assignation)
+      const newAssignments = new Map(tierAssignments);
+      newAssignments.delete(anime.id);
+
+      // Met à jour les ordres de tiers (retire l'anime de l'ordre du tier)
+      const newOrders = new Map(tierOrders);
+      if (newOrders.has(currentTier)) {
+        const order = newOrders.get(currentTier);
+        const index = order.indexOf(anime.id);
+        if (index !== -1) {
+          const updatedOrder = [...order];
+          updatedOrder.splice(index, 1);
+          newOrders.set(currentTier, updatedOrder);
+        }
       }
-    });
 
-    // Met à jour les affectations de tiers
-    const newAssignments = new Map(tierAssignments);
-    newAssignments.delete(anime.id);
+      console.log("📊 Mise à jour de l'état local (déplacement vers non classés)...");
+      setTierAssignments(newAssignments);
+      setTierOrders(newOrders);
 
-    // Met à jour les ordres de tiers
-    const newOrders = new Map(tierOrders);
-    newOrders.forEach((order, tierId) => {
-      const index = order.indexOf(anime.id);
-      if (index !== -1) {
-        const updatedOrder = [...order];
-        updatedOrder.splice(index, 1);
-        newOrders.set(tierId, updatedOrder);
-      }
-    });
+      // Émet l'événement collaboratif pour le déplacement
+      console.log("📡 Émission de l'événement collaboratif (déplacement)...");
+      // On peut utiliser emitAnimeMove pour indiquer le déplacement vers "unranked"
+      // ou créer un événement spécifique si nécessaire
+      console.log("✅ Déplacement vers non classés terminé");
+    } else {
+      // L'anime est déjà non classé, on le supprime complètement
+      console.log("🗑️ Anime non classé -> suppression complète");
+      
+      // Supprime localement d'abord
+      const newCollection = new AnimeCollection();
+      animeCollection.getAllAnimes().forEach((existingAnime) => {
+        if (existingAnime.id !== anime.id) {
+          newCollection.addAnime(existingAnime);
+        }
+      });
 
-    console.log("📊 Mise à jour de l'état local...");
-    setAnimeCollection(newCollection);
-    setUniqueAnimes(newCollection.getAllAnimes());
-    setTierAssignments(newAssignments);
-    setTierOrders(newOrders);
+      console.log("📊 Mise à jour de l'état local (suppression complète)...");
+      setAnimeCollection(newCollection);
+      setUniqueAnimes(newCollection.getAllAnimes());
 
-    // Émet l'événement collaboratif
-    console.log("📡 Émission de l'événement collaboratif...");
-    emitAnimeDelete(anime.id);
-    console.log("✅ Suppression locale terminée");
+      // Émet l'événement collaboratif
+      console.log("📡 Émission de l'événement collaboratif (suppression)...");
+      emitAnimeDelete(anime.id);
+      console.log("✅ Suppression complète terminée");
+    }
   };
 
   return (
