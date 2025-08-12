@@ -20,6 +20,9 @@ export default function AnimeSearch({
   const [isImporting, setIsImporting] = useState(false);
   const [importStatus, setImportStatus] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
+  
+  // État pour les notifications d'ajout d'anime
+  const [addNotification, setAddNotification] = useState(null);
 
   // Recherche d'animes via l'API Jikan
   const searchAnimes = async (query) => {
@@ -67,6 +70,34 @@ export default function AnimeSearch({
           anime.image ||
           "/placeholder-anime.svg",
       };
+
+      // Vérifier si l'anime existe déjà dans la collection
+      let notificationType = "success";
+      let notificationMessage = "";
+
+      if (collection) {
+        const existingAnime = collection.findAnime(normalizedAnime.title);
+        if (existingAnime) {
+          notificationType = "warning";
+          notificationMessage = `📝 "${normalizedAnime.title}" est déjà dans votre liste`;
+        } else {
+          notificationMessage = `✅ "${normalizedAnime.title}" ajouté avec succès !`;
+        }
+      } else {
+        notificationMessage = `✅ "${normalizedAnime.title}" ajouté avec succès !`;
+      }
+
+      // Afficher la notification
+      setAddNotification({
+        type: notificationType,
+        message: notificationMessage,
+        anime: normalizedAnime
+      });
+
+      // Masquer la notification après 4 secondes
+      setTimeout(() => setAddNotification(null), 4000);
+
+      // Ajouter l'anime (même s'il existe déjà, la logique de fusion se fera ailleurs)
       onAnimeAdd(normalizedAnime);
     }
 
@@ -349,6 +380,35 @@ export default function AnimeSearch({
               className={styles.searchInput}
             />
           </div>
+          
+          {/* Notification d'ajout d'anime */}
+          {addNotification && (
+            <div
+              className={`${styles.addNotification} ${
+                addNotification.type === "warning" ? styles.warning : styles.success
+              }`}
+            >
+              <div className={styles.notificationContent}>
+                <div className={styles.notificationMessage}>
+                  {addNotification.message}
+                </div>
+                {addNotification.anime.image && addNotification.anime.image !== "/placeholder-anime.svg" && (
+                  <img
+                    src={addNotification.anime.image}
+                    alt={addNotification.anime.title}
+                    className={styles.notificationImage}
+                  />
+                )}
+              </div>
+              <button
+                className={styles.notificationClose}
+                onClick={() => setAddNotification(null)}
+                title="Fermer"
+              >
+                ×
+              </button>
+            </div>
+          )}
         </div>
 
         <div className={styles.importSection}>

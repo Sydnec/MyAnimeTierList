@@ -292,6 +292,91 @@
   border: 1px solid #ffb3b3;
 }
 
+/* Notifications d'ajout d'anime */
+.addNotification {
+  position: relative;
+  margin: 8px 0 12px 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideInFade 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  font-size: 0.85rem;
+}
+
+.addNotification.success {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 100%);
+  color: #2d7d2d;
+  border: 1px solid #b3d9b3;
+  border-left: 4px solid #4caf50;
+}
+
+.addNotification.warning {
+  background: linear-gradient(135deg, #fff3cd 0%, #fff8db 100%);
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  border-left: 4px solid #ffc107;
+}
+
+.notificationContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.notificationMessage {
+  font-weight: 500;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.notificationImage {
+  width: 28px;
+  height: 39px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.notificationClose {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  padding: 2px;
+  margin-left: 6px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notificationClose:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideInFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 768px) {
   .searchBars {
     grid-template-columns: 1fr;
@@ -309,5 +394,31 @@
   
   .importButton {
     margin-top: 8px;
+  }
+
+  .addNotification {
+    margin: 6px 0 8px 0;
+    padding: 6px 8px;
+    min-height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .notificationContent {
+    gap: 6px;
+  }
+
+  .notificationMessage {
+    font-size: 0.8rem;
+  }
+
+  .notificationImage {
+    width: 22px;
+    height: 31px;
+  }
+
+  .notificationClose {
+    width: 18px;
+    height: 18px;
+    font-size: 1rem;
   }
 }

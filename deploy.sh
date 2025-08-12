@@ -6,7 +6,7 @@
 set -e
 
 PROJECT_DIR="/home/sydnec/myanimetierlist"
-APP_NAME="myanimet-tierlist"
+APP_NAME="myanime-tierlist"
 
 # Couleurs pour les messages
 RED='\033[0;31m'

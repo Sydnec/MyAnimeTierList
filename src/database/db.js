@@ -3,7 +3,7 @@ const path = require("path");
 
 class Database {
   constructor() {
-    this.dbPath = path.join(__dirname, "../../data/myanimet-tierlist.db");
+    this.dbPath = path.join(__dirname, "../../data/myanime-tierlist.db");
     this.db = null;
     this.initializeDatabase();
   }
