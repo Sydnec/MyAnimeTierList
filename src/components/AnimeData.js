@@ -4,13 +4,15 @@
 export class AnimeData {
   constructor(data) {
     this.id = data.mal_id || data.id;
-    this.title = data.title || data.title_english || data.title_japanese;
+    // Priorité au titre anglais, puis titre par défaut, puis japonais
+    this.title = data.title_english || data.title || data.title_japanese;
     this.titles = {
       default: data.title,
       english: data.title_english,
       japanese: data.title_japanese,
       synonyms: data.title_synonyms || [],
     };
+    // Utilise le titre anglais en priorité pour le baseTitle
     this.baseTitle = this.extractBaseTitle(this.title);
 
     // Préserve l'image existante si elle existe déjà
@@ -28,11 +30,6 @@ export class AnimeData {
     this.score = data.score;
     this.status = data.status;
     this.type = data.type;
-
-    // Données spécifiques à la gestion des saisons
-    this.seasons = data.seasons || []; // Toutes les saisons de cet anime
-    this.mainSeasonId = data.mainSeasonId || this.id; // ID de la saison principale/première
-    this.isMainEntry = data.isMainEntry !== undefined ? data.isMainEntry : true; // Si c'est l'entrée principale pour cet anime
   }
 
   // Extrait le titre de base en supprimant les indicateurs de saison
@@ -68,69 +65,11 @@ export class AnimeData {
     return null;
   }
 
-  // Ajoute une saison à cet anime
-  addSeason(seasonData) {
-    const existingSeason = this.seasons.find((s) => s.id === seasonData.id);
-    if (!existingSeason) {
-      this.seasons.push({
-        id: seasonData.id,
-        title: seasonData.title,
-        year: seasonData.year,
-        status: seasonData.status,
-        episodes: seasonData.episodes,
-      });
-    }
-  }
-
-  // Vérifie si deux animes sont le même (différentes saisons)
-  static isSameAnime(anime1, anime2) {
-    // Comparaison par titre de base
-    if (anime1.baseTitle.toLowerCase() === anime2.baseTitle.toLowerCase()) {
-      return true;
-    }
-
-    // Comparaison par titres alternatifs
-    const allTitles1 = [
-      anime1.titles.default,
-      anime1.titles.english,
-      anime1.titles.japanese,
-      ...anime1.titles.synonyms,
-    ]
-      .filter(Boolean)
-      .map((t) => t.toLowerCase());
-
-    const allTitles2 = [
-      anime2.titles.default,
-      anime2.titles.english,
-      anime2.titles.japanese,
-      ...anime2.titles.synonyms,
-    ]
-      .filter(Boolean)
-      .map((t) => t.toLowerCase());
-
-    // Vérifie si un titre correspond
-    for (const title1 of allTitles1) {
-      for (const title2 of allTitles2) {
-        if (title1 === title2) return true;
-
-        // Comparaison de base après suppression des indicateurs de saison
-        const base1 = new AnimeData({ title: title1 }).extractBaseTitle(title1);
-        const base2 = new AnimeData({ title: title2 }).extractBaseTitle(title2);
-        if (base1 && base2 && base1 === base2) return true;
-      }
-    }
-
-    return false;
-  }
-
   // Fusion deux animes (différentes saisons) en un seul
   static mergeAnimes(anime1, anime2) {
     // Garde l'anime avec l'année la plus ancienne comme principal
     const mainAnime = anime1.year <= anime2.year ? anime1 : anime2;
     const otherAnime = anime1.year <= anime2.year ? anime2 : anime1;
-
-    // Ajoute la saison de l'autre anime
-    mainAnime.addSeason(otherAnime);
 
     // Met à jour les titres si nécessaire
     if (!mainAnime.titles.english && otherAnime.titles.english) {
@@ -184,17 +123,5 @@ export class AnimeCollection {
       .extractBaseTitle(title)
       .toLowerCase();
     return this.animes.get(baseTitle);
-  }
-
-  // Import depuis une liste MyAnimeList
-  importFromMAL(malData) {
-    const importedAnimes = [];
-
-    for (const item of malData) {
-      const importedAnime = this.addAnime(item);
-      importedAnimes.push(importedAnime);
-    }
-
-    return importedAnimes;
   }
 }

@@ -574,12 +574,6 @@ export default function TierList({
   const organizedAnimes = organizeAnimesByTier();
   const firstUnrankedAnime = organizedAnimes.unranked?.[0];
 
-  // Fonction helper pour obtenir la couleur d'un tier
-  const getTierColor = (tierId) => {
-    const tier = tiers.find(t => t.id === tierId);
-    return tier ? tier.color : null;
-  };
-
   return (
     <div className={styles.tierListContainer}>
       <div className={styles.tierList}>
@@ -690,7 +684,6 @@ export default function TierList({
                         <AnimeCard
                           anime={anime.draggedAnime}
                           tier={tier.id}
-                          tierColor={getTierColor(tier.id)}
                           isPreview={true}
                         />
                       </div>
@@ -698,11 +691,9 @@ export default function TierList({
                       <AnimeCard
                         anime={anime}
                         tier={tier.id}
-                        tierColor={getTierColor(tier.id)}
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
                         onDelete={handleAnimeUnrank}
-                        isDragging={draggedItem?.id === anime.id}
                       />
                     )}
                   </div>
@@ -722,7 +713,6 @@ export default function TierList({
                       <AnimeCard
                         anime={draggedItem}
                         tier={tier.id}
-                        tierColor={getTierColor(tier.id)}
                         isPreview={true}
                       />
                     </div>
@@ -772,7 +762,6 @@ export default function TierList({
                       onDragStart={handleDragStart}
                       onDragEnd={handleDragEnd}
                       onDelete={onAnimeDelete}
-                      isDragging={draggedItem?.id === anime.id}
                     />
                   )}
                 </div>

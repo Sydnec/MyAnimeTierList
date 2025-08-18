@@ -379,6 +379,48 @@ export default function AnimeSearch({
               ref={searchInputRef}
               className={styles.searchInput}
             />
+            
+            {/* Résultats de recherche en menu déroulant */}
+            {searchResults.length > 0 && (
+              <div className={styles.results}>
+                <div className={styles.resultsList}>
+                  {searchResults.map((anime, index) => (
+                    <div
+                      key={anime.mal_id}
+                      className={`${styles.resultItem} ${
+                        index === selectedIndex ? styles.selected : ""
+                      }`}
+                      onClick={() => handleAddAnime(anime)}
+                    >
+                      <img
+                        src={
+                          anime.images?.jpg?.small_image_url ||
+                          "/placeholder-anime.svg"
+                        }
+                        alt={anime.title}
+                        className={styles.resultImage}
+                      />
+                      <div className={styles.resultInfo}>
+                        <h4>{anime.title}</h4>
+                        {anime.year && (
+                          <span className={styles.year}>({anime.year})</span>
+                        )}
+                        <div className={styles.metadata}>
+                          {anime.type && (
+                            <span className={styles.type}>{anime.type}</span>
+                          )}
+                          {anime.episodes && (
+                            <span className={styles.episodes}>
+                              {anime.episodes} ép.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Notification d'ajout d'anime */}
@@ -461,48 +503,6 @@ export default function AnimeSearch({
           )}
         </div>
       </div>
-
-      {/* Résultats de recherche */}
-      {searchResults.length > 0 && (
-        <div className={styles.results}>
-          <div className={styles.resultsList}>
-            {searchResults.map((anime, index) => (
-              <div
-                key={anime.mal_id}
-                className={`${styles.resultItem} ${
-                  index === selectedIndex ? styles.selected : ""
-                }`}
-                onClick={() => handleAddAnime(anime)}
-              >
-                <img
-                  src={
-                    anime.images?.jpg?.small_image_url ||
-                    "/placeholder-anime.svg"
-                  }
-                  alt={anime.title}
-                  className={styles.resultImage}
-                />
-                <div className={styles.resultInfo}>
-                  <h4>{anime.title}</h4>
-                  {anime.year && (
-                    <span className={styles.year}>({anime.year})</span>
-                  )}
-                  <div className={styles.metadata}>
-                    {anime.type && (
-                      <span className={styles.type}>{anime.type}</span>
-                    )}
-                    {anime.episodes && (
-                      <span className={styles.episodes}>
-                        {anime.episodes} ép.
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

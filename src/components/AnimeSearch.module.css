@@ -28,6 +28,7 @@
 
 .searchBox {
   position: relative;
+  z-index: 1000;
 }
 
 .importBox {
@@ -156,11 +157,18 @@
 }
 
 .results {
-  margin-top: 8px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  margin-top: 4px;
   background: var(--background);
   border: 1px solid var(--gray-alpha-200);
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: dropdownFadeIn 0.2s ease-out;
 }
 
 .resultsList {
@@ -364,6 +372,17 @@
 .notificationClose:hover {
   opacity: 1;
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes dropdownFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInFade {
