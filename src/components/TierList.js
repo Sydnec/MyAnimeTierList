@@ -118,7 +118,7 @@ export default function TierList({
     Object.keys(organized).forEach((tierId) => {
       // Ignore les animés non-classés car ils sont déjà triés alphabétiquement
       if (tierId === "unranked") return;
-      
+
       const tierOrder = tierOrders.get(tierId);
       if (tierOrder && tierOrder.length > 0) {
         // Trie selon l'ordre personnalisé, puis ajoute les nouveaux animes à la fin
@@ -353,7 +353,7 @@ export default function TierList({
     Object.keys(organized).forEach((tierId) => {
       // Ignore les animés non-classés car ils sont déjà triés alphabétiquement
       if (tierId === "unranked") return;
-      
+
       const tierOrder = tierOrders.get(tierId);
       if (tierOrder && tierOrder.length > 0) {
         const orderedAnimes = [];
@@ -442,7 +442,7 @@ export default function TierList({
     Object.keys(organized).forEach((tierId) => {
       // Ignore les animés non-classés car ils sont déjà triés alphabétiquement
       if (tierId === "unranked") return;
-      
+
       const tierOrder = tierOrders.get(tierId);
       if (tierOrder && tierOrder.length > 0) {
         const orderedAnimes = [];
@@ -531,7 +531,7 @@ export default function TierList({
   // Gérer le déclassement d'un anime (équivalent à un drag vers "unranked")
   const handleAnimeUnrank = (anime) => {
     const currentTier = tierAssignments.get(anime.id);
-    
+
     if (!currentTier) {
       // L'anime est déjà non classé, on appelle la suppression complète
       if (onAnimeDelete) {
@@ -545,7 +545,7 @@ export default function TierList({
     newAssignments.delete(anime.id);
 
     const newTierOrders = new Map(tierOrders);
-    
+
     // Nettoyer l'ordre de l'ancien tier
     if (currentTier !== "unranked") {
       const oldOrder = newTierOrders.get(currentTier) || [];
@@ -583,9 +583,8 @@ export default function TierList({
           <div className={styles.headerControls}>
             <button
               onClick={toggleEditMode}
-              className={`${styles.editModeButton} ${
-                editMode ? styles.editModeActive : ""
-              }`}
+              className={`${styles.editModeButton} ${editMode ? styles.editModeActive : ""
+                }`}
               title={
                 editMode ? "Quitter le mode édition" : "Activer le mode édition"
               }
@@ -670,9 +669,8 @@ export default function TierList({
                 organizedAnimes[tier.id].map((anime, index) => (
                   <div
                     key={anime.id}
-                    className={`${styles.animeCardWrapper} ${
-                      anime.isPlaceholder ? styles.placeholder : ""
-                    } ${draggedItem?.id === anime.id ? styles.dragging : ""}`}
+                    className={`${styles.animeCardWrapper} ${anime.isPlaceholder ? styles.placeholder : ""
+                      } ${draggedItem?.id === anime.id ? styles.dragging : ""}`}
                     onDragOver={(e) =>
                       !anime.isPlaceholder &&
                       handleDragOverAnime(e, anime, tier.id)
@@ -700,11 +698,10 @@ export default function TierList({
                 ))
               ) : (
                 <div
-                  className={`${styles.emptyTier} ${
-                    !(draggedItem && dragOverPosition?.tierId === tier.id)
-                      ? styles.hasPlaceholder
-                      : ""
-                  }`}
+                  className={`${styles.emptyTier} ${!(draggedItem && dragOverPosition?.tierId === tier.id)
+                    ? styles.hasPlaceholder
+                    : ""
+                    }`}
                   onDragOver={(e) => handleDragOverEmptyTier(e, tier.id)}
                   onDrop={(e) => handleDrop(e, tier.id)}
                 >
@@ -743,9 +740,8 @@ export default function TierList({
               organizedAnimes.unranked.map((anime, index) => (
                 <div
                   key={anime.id}
-                  className={`${styles.animeCardWrapper} ${
-                    anime.isPlaceholder ? styles.placeholder : ""
-                  } ${draggedItem?.id === anime.id ? styles.dragging : ""}`}
+                  className={`${styles.animeCardWrapper} ${anime.isPlaceholder ? styles.placeholder : ""
+                    } ${draggedItem?.id === anime.id ? styles.dragging : ""}`}
                   onDragOver={(e) =>
                     !anime.isPlaceholder &&
                     handleDragOverAnime(e, anime, "unranked")
@@ -768,11 +764,10 @@ export default function TierList({
               ))
             ) : (
               <div
-                className={`${styles.emptyTier} ${
-                  !(draggedItem && dragOverPosition?.tierId === "unranked")
-                    ? styles.hasPlaceholder
-                    : ""
-                }`}
+                className={`${styles.emptyTier} ${!(draggedItem && dragOverPosition?.tierId === "unranked")
+                  ? styles.hasPlaceholder
+                  : ""
+                  }`}
                 onDragOver={(e) => handleDragOverEmptyTier(e, "unranked")}
                 onDrop={(e) => handleDrop(e, "unranked")}
               >
@@ -792,9 +787,8 @@ export default function TierList({
       {/* Petit menu latéral fixe avec le premier anime non classé */}
       {firstUnrankedAnime && (
         <div
-          className={`${styles.previewPanel} ${
-            previewOpen ? styles.previewOpen : styles.previewClosed
-          }`}
+          className={`${styles.previewPanel} ${previewOpen ? styles.previewOpen : styles.previewClosed
+            }`}
         >
           <button
             onClick={() => setPreviewOpen(!previewOpen)}
@@ -833,6 +827,11 @@ export default function TierList({
                   {firstUnrankedAnime.year && (
                     <div className={styles.animeYear}>
                       ({firstUnrankedAnime.year})
+                    </div>
+                  )}
+                  {firstUnrankedAnime.score && (
+                    <div className={styles.animeScore}>
+                      <strong>Score MAL :</strong> {firstUnrankedAnime.score}
                     </div>
                   )}
                 </div>

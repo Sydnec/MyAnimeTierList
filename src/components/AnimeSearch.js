@@ -20,7 +20,7 @@ export default function AnimeSearch({
   const [isImporting, setIsImporting] = useState(false);
   const [importStatus, setImportStatus] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
-  
+
   // État pour les notifications d'ajout d'anime
   const [addNotification, setAddNotification] = useState(null);
 
@@ -35,7 +35,7 @@ export default function AnimeSearch({
     setIsSearching(true);
 
     try {
-      const results = await MALService.searchAnime(query, 10);
+      const results = await MALService.searchAnime(query, 25);
       setSearchResults(results);
       setSelectedIndex(0);
     } catch (error) {
@@ -60,9 +60,12 @@ export default function AnimeSearch({
 
   const handleAddAnime = (anime) => {
     if (onAnimeAdd) {
-      // Normalise l'objet anime pour s'assurer que l'image est dans le bon champ
+      // Normalise l'objet anime pour correspondre au schéma SQL
       const normalizedAnime = {
         ...anime,
+        title: anime.title || anime.title_english || anime.title_japanese,
+        title_english: anime.title_english || null,
+        title_original: anime.title_original || anime.title_japanese || null,
         image:
           anime.images?.jpg?.image_url ||
           anime.images?.jpg?.small_image_url ||
@@ -162,6 +165,8 @@ export default function AnimeSearch({
         if (status === "2" || status === "Completed") {
           const malId = anime.querySelector("series_animedb_id")?.textContent;
           const title = anime.querySelector("series_title")?.textContent;
+          const title_english = anime.querySelector("series_title_english")?.textContent || null;
+          const title_japanese = anime.querySelector("series_title_japanese")?.textContent || null;
           const episodes = anime.querySelector("series_episodes")?.textContent;
           const type = anime.querySelector("series_type")?.textContent;
           const score = anime.querySelector("my_score")?.textContent;
@@ -169,6 +174,8 @@ export default function AnimeSearch({
           console.log("✅ Found completed anime:", {
             malId,
             title,
+            title_english,
+            title_japanese,
             episodes,
             type,
             score,
@@ -191,9 +198,11 @@ export default function AnimeSearch({
                 mal_id: parsedMalId,
                 id: parsedMalId, // Use mal_id as id
                 title: title,
+                title_english: title_english,
+                title_original: title_japanese,
                 episodes: episodes ? parseInt(episodes) : null,
                 type: type || "Unknown",
-                user_score: score ? parseInt(score) : null,
+                score: score ? parseFloat(score) : null,
                 image: "/placeholder-anime.svg", // Simplified for now
               };
 
@@ -379,7 +388,7 @@ export default function AnimeSearch({
               ref={searchInputRef}
               className={styles.searchInput}
             />
-            
+
             {/* Résultats de recherche en menu déroulant */}
             {searchResults.length > 0 && (
               <div className={styles.results}>
@@ -387,9 +396,8 @@ export default function AnimeSearch({
                   {searchResults.map((anime, index) => (
                     <div
                       key={anime.mal_id}
-                      className={`${styles.resultItem} ${
-                        index === selectedIndex ? styles.selected : ""
-                      }`}
+                      className={`${styles.resultItem} ${index === selectedIndex ? styles.selected : ""
+                        }`}
                       onClick={() => handleAddAnime(anime)}
                     >
                       <img
@@ -422,13 +430,12 @@ export default function AnimeSearch({
               </div>
             )}
           </div>
-          
+
           {/* Notification d'ajout d'anime */}
           {addNotification && (
             <div
-              className={`${styles.addNotification} ${
-                addNotification.type === "warning" ? styles.warning : styles.success
-              }`}
+              className={`${styles.addNotification} ${addNotification.type === "warning" ? styles.warning : styles.success
+                }`}
             >
               <div className={styles.notificationContent}>
                 <div className={styles.notificationMessage}>
@@ -457,9 +464,8 @@ export default function AnimeSearch({
           <h3>📋 Import MyAnimeList</h3>
 
           <div
-            className={`${styles.dropZone} ${
-              isDragOver ? styles.dragOver : ""
-            } ${isImporting ? styles.importing : ""}`}
+            className={`${styles.dropZone} ${isDragOver ? styles.dragOver : ""
+              } ${isImporting ? styles.importing : ""}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -494,9 +500,8 @@ export default function AnimeSearch({
 
           {importStatus && (
             <div
-              className={`${styles.status} ${
-                importStatus.includes("❌") ? styles.error : styles.success
-              }`}
+              className={`${styles.status} ${importStatus.includes("❌") ? styles.error : styles.success
+                }`}
             >
               {importStatus}
             </div>

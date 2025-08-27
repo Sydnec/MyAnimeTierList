@@ -70,6 +70,14 @@ app.prepare().then(async () => {
 
     // Ajout d'un anime
     socket.on("anime-add", async (animeData) => {
+      // S'assurer que les champs correspondent au schéma SQL
+      animeData = {
+        ...animeData,
+        title: animeData.title || animeData.title_english || animeData.title_original,
+        title_english: animeData.title_english || null,
+        title_original: animeData.title_original || null,
+      };
+
       console.log(
         "📥 Anime ajouté:",
         animeData.title,
@@ -230,6 +238,14 @@ app.prepare().then(async () => {
 
     // Import en lot depuis MAL
     socket.on("bulk-import", async (animes) => {
+      // Adapter chaque anime au schéma SQL
+      animes = animes.map(animeData => ({
+        ...animeData,
+        title: animeData.title || animeData.title_english || animeData.title_original,
+        title_english: animeData.title_english || null,
+        title_original: animeData.title_original || null,
+      }));
+
       console.log(`Import en lot de ${animes.length} animes`);
 
       try {
@@ -390,6 +406,14 @@ app.prepare().then(async () => {
 
     // Mise à jour d'un anime existant (pour les images enrichies)
     socket.on("anime-update", async (updatedAnime) => {
+      // Adapter au schéma SQL
+      updatedAnime = {
+        ...updatedAnime,
+        title: updatedAnime.title || updatedAnime.title_english || updatedAnime.title_original,
+        title_english: updatedAnime.title_english || null,
+        title_original: updatedAnime.title_original || null,
+      };
+
       console.log(
         "🔄 Mise à jour d'anime:",
         updatedAnime.title,

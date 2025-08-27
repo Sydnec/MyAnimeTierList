@@ -36,14 +36,10 @@ class Database {
         mal_id INTEGER,
         title TEXT NOT NULL,
         title_english TEXT,
-        title_japanese TEXT,
+        title_original TEXT,
         image TEXT,
         score REAL,
         year INTEGER,
-        season TEXT,
-        episodes INTEGER,
-        status TEXT,
-        genres TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
@@ -130,33 +126,25 @@ class Database {
         mal_id,
         title,
         title_english,
-        title_japanese,
+        title_original,
         image,
         score,
         year,
-        season,
-        episodes,
-        status,
-        genres,
       } = animeData;
 
       this.db.run(
         `INSERT OR REPLACE INTO animes 
-         (id, mal_id, title, title_english, title_japanese, image, score, year, season, episodes, status, genres, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+         (id, mal_id, title, title_english, title_original, image, score, year, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
         [
           id,
           mal_id,
           title,
           title_english,
-          title_japanese,
+          title_original,
           image,
           score,
           year,
-          season,
-          episodes,
-          status,
-          JSON.stringify(genres),
         ],
         function (err) {
           if (err) {
@@ -179,7 +167,7 @@ class Database {
   async getAllAnimes() {
     return new Promise((resolve, reject) => {
       this.db.all(
-        `SELECT * FROM animes ORDER BY created_at DESC`,
+        `SELECT * FROM animes ORDER BY title`,
         [],
         (err, rows) => {
           if (err) {
@@ -428,6 +416,41 @@ class Database {
       console.error("Erreur lors de la récupération de l'état complet:", error);
       throw error;
     }
+  }
+
+  async updateAnime(id, setQuery) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `UPDATE animes SET ${setQuery} WHERE id = ?`,
+        [id],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ changes: this.changes });
+        }
+      );
+    });
+  }
+
+  async manualSelect(query) {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        query,
+        [],
+        function (err, rows) {
+          if (err) reject(err);
+          else resolve(rows);
+        }
+      );
+    });
+  }
+
+  async manualRun(query, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.run(query, params, function (err) {
+        if (err) reject(err);
+        else resolve({ changes: this.changes });
+      });
+    });
   }
 
   close() {

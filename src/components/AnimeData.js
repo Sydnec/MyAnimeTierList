@@ -3,27 +3,20 @@
 
 export class AnimeData {
   constructor(data) {
-    this.id = data.mal_id || data.id;
-    // Priorité au titre anglais, puis titre par défaut, puis japonais
-    this.title = data.title_english || data.title || data.title_japanese;
-    this.titles = {
-      default: data.title,
-      english: data.title_english,
-      japanese: data.title_japanese,
-      synonyms: data.title_synonyms || [],
-    };
-    // Utilise le titre anglais en priorité pour le baseTitle
-    this.baseTitle = this.extractBaseTitle(this.title);
-
-    // Préserve l'image existante si elle existe déjà
+    this.id = data.id || data.mal_id;
+    // Champs principaux selon la base SQL
+    this.title = data.title;
+    this.title_english = data.title_english || null;
+    this.title_original = data.title_original || data.title_japanese || null;
+    // Pour compatibilité, on garde le titre anglais prioritaire pour baseTitle
+    this.baseTitle = this.extractBaseTitle(this.title_english || this.title || this.title_original);
     this.image =
-      data.image || // Image déjà normalisée
+      data.image ||
       data.images?.jpg?.image_url ||
       data.images?.jpg?.small_image_url ||
       data.images?.jpg?.large_image_url ||
       data.image_url ||
       "/placeholder-anime.svg";
-
     this.year = data.year || this.extractYear(data.aired);
     this.genres = data.genres || [];
     this.synopsis = data.synopsis;
@@ -72,8 +65,8 @@ export class AnimeData {
     const otherAnime = anime1.year <= anime2.year ? anime2 : anime1;
 
     // Met à jour les titres si nécessaire
-    if (!mainAnime.titles.english && otherAnime.titles.english) {
-      mainAnime.titles.english = otherAnime.titles.english;
+    if (!mainAnime.title_english && otherAnime.title_english) {
+      mainAnime.title_english = otherAnime.title_english;
     }
 
     // Préserve la meilleure image disponible

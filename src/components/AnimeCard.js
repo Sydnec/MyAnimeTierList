@@ -31,9 +31,8 @@ export default function AnimeCard({
 
   return (
     <div
-      className={`${styles.card} ${tier ? styles[`tier-${tier}`] : ""} ${
-        isPreview ? styles.preview : ""
-      } ${isPreviewPanel ? styles.previewPanel : ""}`}
+      className={`${styles.card} ${tier ? styles[`tier-${tier}`] : ""} ${isPreview ? styles.preview : ""
+        } ${isPreviewPanel ? styles.previewPanel : ""}`}
       draggable={!isPreview}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
