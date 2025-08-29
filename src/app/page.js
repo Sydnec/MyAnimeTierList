@@ -11,7 +11,7 @@ import styles from "./page.module.css";
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [animeCollection, setAnimeCollection] = useState(new AnimeCollection());
-  const [uniqueAnimes, setUniqueAnimes] = useState([]);
+  const [allAnimes, setAllAnimes] = useState([]);
   const [tierAssignments, setTierAssignments] = useState(new Map());
   const [customTiers, setCustomTiers] = useState(null);
   const [tierOrders, setTierOrders] = useState(new Map());
@@ -37,19 +37,15 @@ export default function Home() {
   // Synchronise l'état local avec l'état collaboratif
   useEffect(() => {
     if (collaborativeState.animes.length > 0) {
-      const collection = new AnimeCollection();
-      collaborativeState.animes.forEach((anime) => {
-        collection.addAnime(anime);
-      });
-      setAnimeCollection(collection);
-      setUniqueAnimes(collection.getAllAnimes());
+      setAllAnimes(collaborativeState.animes);
+      // Optionnel : animeCollection peut rester pour compatibilité, mais n'est plus utilisé pour l'affichage
     }
 
     if (Object.keys(collaborativeState.tierAssignments).length > 0) {
       const newAssignments = new Map();
       Object.entries(collaborativeState.tierAssignments).forEach(
         ([animeId, tierId]) => {
-          newAssignments.set(parseInt(animeId), tierId);
+          newAssignments.set(animeId, tierId); // garder l'ID en string
         }
       );
       setTierAssignments(newAssignments);
@@ -106,7 +102,7 @@ export default function Home() {
     );
 
     setAnimeCollection(newCollection);
-    setUniqueAnimes(newCollection.getAllAnimes());
+    setAllAnimes(newCollection.animes ? Array.from(newCollection.animes.values()) : []);
 
     // Émet l'événement collaboratif
     emitAnimeAdd(addedAnime);
@@ -142,7 +138,7 @@ export default function Home() {
     });
 
     setAnimeCollection(newCollection);
-    setUniqueAnimes(newCollection.getAllAnimes());
+    setAllAnimes(newCollection.animes ? Array.from(newCollection.animes.values()) : []);
 
     // Émet l'événement collaboratif
     emitBulkImport(processedAnimes);
@@ -178,7 +174,7 @@ export default function Home() {
     // Cette fonction ne gère que la suppression complète (animes déjà non classés)
     // Le déclassement est maintenant géré par TierList.handleAnimeUnrank
     console.log("🗑️ Suppression complète de l'anime");
-    
+
     // Supprime localement d'abord
     const newCollection = new AnimeCollection();
     animeCollection.getAllAnimes().forEach((existingAnime) => {
@@ -204,7 +200,7 @@ export default function Home() {
 
     console.log("📊 Mise à jour de l'état local (suppression complète)...");
     setAnimeCollection(newCollection);
-    setUniqueAnimes(newCollection.getAllAnimes());
+    setAllAnimes(newCollection.animes ? Array.from(newCollection.animes.values()) : []);
     setTierAssignments(newAssignments);
     setTierOrders(newOrders);
 
@@ -231,7 +227,7 @@ export default function Home() {
       />
 
       <TierList
-        animes={uniqueAnimes}
+        animes={allAnimes}
         onTierChange={handleTierChange}
         onTierAssignmentsChange={handleTierAssignmentsChange}
         onTiersChange={handleTiersChange}

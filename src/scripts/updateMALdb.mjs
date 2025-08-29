@@ -16,18 +16,18 @@ const rl = readline.createInterface({
     let updatedCount = 0;
 
     for (const anime of animes) {
-      const defaultSearchTitle = anime.title || anime.title_english || anime.title_japanese;
+      const defaultSearchTitle = anime.title || anime.title_english;
       if (!defaultSearchTitle) {
         console.warn(`⏭️ Pas de titre pour l'anime:`, anime);
         continue;
       }
       // Demande à l'utilisateur le terme de recherche (pré-rempli avec le titre trouvé)
-      // const searchTitle = await new Promise((resolve) => {
-      //   rl.question(`\nTerme de recherche pour cet anime [${defaultSearchTitle}] : `, (input) => {
-      //     resolve(input.trim() ? input.trim() : defaultSearchTitle);
-      //   });
-      // });
-      // Mise en évidence du titre trouvé en BDD (en vert)
+      const searchTitle = await new Promise((resolve) => {
+        rl.question(`\nTerme de recherche pour cet anime [${defaultSearchTitle}] : `, (input) => {
+          resolve(input.trim() ? input.trim() : defaultSearchTitle);
+        });
+      });
+      // Mise en évidence du titre trouvé en BDD(en vert)
       const green = "\x1b[32m";
       const reset = "\x1b[0m";
       console.log(`\n🔎 Recherche pour: ${green}${searchTitle}${reset}`);
@@ -39,14 +39,12 @@ const rl = readline.createInterface({
       // Sélection automatique si correspondance exacte sur le titre, le titre japonais ou l'image
       let autoIdx = results.findIndex(
         (res) =>
-          res.title === searchTitle ||
-          (res.title_japanese && res.title_japanese === searchTitle) ||
           (anime.image && (
             res.images?.jpg?.image_url === anime.image ||
             res.images?.jpg?.small_image_url === anime.image ||
             res.images?.jpg?.large_image_url === anime.image ||
             res.image_url === anime.image
-          ))
+          )) || res.title === searchTitle
       );
       let idx;
       if (autoIdx !== -1) {
@@ -99,16 +97,11 @@ const rl = readline.createInterface({
       const updatedAnime = {
         id: malData.mal_id,
         mal_id: malData.mal_id,
-        title: malData.title_english || malData.title || malData.title_japanese,
+        title: malData.title_english || malData.title,
         title_english: malData.title_english,
-        title_japanese: malData.title_japanese,
         image: imageUrl,
         score: malData.score,
         year: malData.aired?.prop?.from?.year || null,
-        season: malData.season || null,
-        episodes: malData.episodes,
-        status: malData.status,
-        genres: malData.genres ? malData.genres.map((g) => g.name) : [],
       };
       // Remplace l'appel à addAnime par une requête UPDATE directe
       const updateQuery = `UPDATE animes SET
@@ -116,34 +109,24 @@ const rl = readline.createInterface({
         mal_id = ?,
         title = ?,
         title_english = ?,
-        title_japanese = ?,
         image = ?,
         score = ?,
         year = ?,
-        season = ?,
-        episodes = ?,
-        status = ?,
-        genres = ?,
         updated_at = CURRENT_TIMESTAMP
         WHERE rowid = (SELECT rowid FROM animes WHERE id = ? LIMIT 1)`;
       const params = [
         malData.mal_id,
         malData.mal_id,
-        malData.title || malData.title_english || malData.title_japanese,
+        malData.title || malData.title_english,
         malData.title_english,
-        malData.title_japanese,
         imageUrl,
         malData.score,
         malData.aired?.prop?.from?.year || null,
-        malData.season || null,
-        malData.episodes,
-        malData.status,
-        JSON.stringify(malData.genres ? malData.genres.map((g) => g.name) : []),
         anime.id // id d'origine pour cibler la bonne ligne
       ];
       await db.manualRun(updateQuery, params);
       updatedCount++;
-      console.log(`✅ Anime mis à jour: ${malData.title_english || malData.title || malData.title_japanese} (mal_id=${malData.mal_id})`);
+      console.log(`✅ Anime mis à jour: ${malData.title_english || malData.title} (mal_id=${malData.mal_id})`);
     }
     console.log(`\n🎉 Mise à jour terminée : ${updatedCount} animes mis à jour.`);
     rl.close();

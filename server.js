@@ -27,6 +27,7 @@ let collaborativeState = {
 // Fonction pour charger l'état depuis la base de données
 async function loadStateFromDB() {
   try {
+    console.time('Chargement complet état BDD');
     const state = await db.getFullState();
     collaborativeState = {
       ...state,
@@ -35,6 +36,7 @@ async function loadStateFromDB() {
     console.log(
       `État chargé depuis la base de données: ${state.animes.length} animes, ${state.tiers.length} tiers`
     );
+    console.timeEnd('Chargement complet état BDD');
   } catch (error) {
     console.error(
       "Erreur lors du chargement depuis la base de données:",
@@ -164,8 +166,6 @@ app.prepare().then(async () => {
         // Sauvegarde en base de données
         if (tierId === "unranked") {
           await db.removeAnimeFromTier(animeId);
-        } else {
-          await db.assignAnimeToTier(animeId, tierId, position || 0);
         }
 
         // Met à jour l'état en mémoire
@@ -200,6 +200,11 @@ app.prepare().then(async () => {
 
           const insertPosition = Math.min(position || 0, tierOrder.length);
           tierOrder.splice(insertPosition, 0, animeId);
+
+          // Met à jour la position de tous les animes du tier dans la BDD (en parallèle)
+          await Promise.all(
+            tierOrder.map((id, i) => db.assignAnimeToTier(id, tierId, i))
+          );
         }
 
         collaborativeState.lastModified = Date.now();

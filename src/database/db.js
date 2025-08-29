@@ -67,8 +67,14 @@ class Database {
         if (err) {
           console.error("Erreur création table tiers:", err);
         } else {
-          // Insérer les tiers par défaut seulement après création de la table
-          this.initializeDefaultTiers();
+          // Insérer les tiers par défaut seulement si la table est vide
+          this.db.get('SELECT COUNT(*) as count FROM tiers', (err, row) => {
+            if (err) {
+              console.error('Erreur lors de la vérification du nombre de tiers:', err);
+            } else if (row.count === 0) {
+              this.initializeDefaultTiers();
+            }
+          });
         }
       }
     );
@@ -167,7 +173,7 @@ class Database {
   async getAllAnimes() {
     return new Promise((resolve, reject) => {
       this.db.all(
-        `SELECT * FROM animes ORDER BY title`,
+        `SELECT id, mal_id, title, title_english, title_original, image, score, year FROM animes ORDER BY title`,
         [],
         (err, rows) => {
           if (err) {
@@ -401,9 +407,15 @@ class Database {
 
   async getFullState() {
     try {
+      const t0 = Date.now();
       const animes = await this.getAllAnimes();
+      const t1 = Date.now();
       const tiers = await this.getAllTiers();
+      const t2 = Date.now();
       const { assignments, orders } = await this.getTierAssignments();
+      const t3 = Date.now();
+
+      console.log(`[PERF] getAllAnimes: ${t1 - t0}ms, getAllTiers: ${t2 - t1}ms, getTierAssignments: ${t3 - t2}ms`);
 
       return {
         animes,
